@@ -1,31 +1,31 @@
-// See https://github.com/typicode/json-server#module
-const jsonServer = require('json-server')
+const jsonServer = require('json-server');
+const path = require('path');
 
-const server = jsonServer.create()
+const server = jsonServer.create();
+const router = jsonServer.router('db.json');
 
-// Uncomment to allow write operations
-// const fs = require('fs')
-// const path = require('path')
-// const filePath = path.join('db.json')
-// const data = fs.readFileSync(filePath, "utf-8");
-// const db = JSON.parse(data);
-// const router = jsonServer.router(db)
+// Serve static files from the "public" folder
+const middlewares = jsonServer.defaults({
+    static: path.join(__dirname, 'public')
+});
 
-// Comment out to allow write operations
-const router = jsonServer.router('db.json')
+server.use(middlewares);
 
-const middlewares = jsonServer.defaults()
-
-server.use(middlewares)
-// Add this before server.use(router)
+// Rewriting API routes to match your expected endpoints
 server.use(jsonServer.rewriter({
-    '/api/*': '/$1',
+    '/api/*': '/$1',  // Example: "/api/CategoryCard" → "/CategoryCard"
     '/blog/:resource/:id/show': '/:resource/:id'
-}))
-server.use(router)
-server.listen(3000, () => {
-    console.log('JSON Server is running')
-})
+}));
 
-// Export the Server API
-module.exports = server
+// Use the router
+server.use(router);
+
+// Start server on port 8080
+server.listen(8080, () => {
+    console.log('✅ JSON Server is running on http://localhost:8080');
+    console.log('📂 Serving static files from /public');
+    console.log('🔗 API endpoint available at http://localhost:8080/CategoryCard');
+});
+
+// Export the Server API (if needed for integration)
+module.exports = server;
